@@ -4,6 +4,8 @@
 # Raise ground_height_threshold_m or amplification_factor for uneven terrain
 # Adjust min_distance_m and max_distance_m to suit sensor placement
 # Tweak voxel_grid_* resolutions to control clustering density
+# The parameters below are tuned for removing ground and detecting
+# obstacles on moderately steep hills.
 processor:
   ros__parameters:
     input_cloud_topic: /pointcloud_organized
@@ -21,15 +23,15 @@ processor:
       image_height: 64                 # expected number of laser rings
       # Segmentation algorithm tuning parameters
       assume_unorganized_cloud: false  # set true if incoming cloud has no ring index
-      grid_radial_spacing_m: 1.0       # radial cell size used in RECM grid (was 2.0)
-      grid_slice_resolution_deg: 0.5   # azimuth slice resolution (was 1.0)
-      ground_height_threshold_m: 0.25  # difference from estimated ground to mark obstacle
-      road_maximum_slope_m_per_m: 0.25 # expected road slope in meters per meter
+      grid_radial_spacing_m: 0.8       # radial cell size used in RECM grid
+      grid_slice_resolution_deg: 0.5   # azimuth slice resolution
+      ground_height_threshold_m: 0.35  # obstacle height threshold
+      road_maximum_slope_m_per_m: 0.40 # expected road slope in meters per meter
       min_distance_m: 1.0              # ignore points closer than this distance
       max_distance_m: 80.0             # ignore points farther than this distance
       sensor_height_m: 1.73            # lidar height relative to ground
-      kernel_threshold_distance_m: 1.5 # RECM morphological kernel diameter in meters
-      amplification_factor: 3.0        # vertical difference amplification for RECM
+      kernel_threshold_distance_m: 2.0 # RECM morphological kernel diameter in meters
+      amplification_factor: 4.0        # vertical difference amplification for RECM
       z_min_m: -2.0                    # minimum z relative to sensor to keep
       z_max_m: 3.0                     # maximum z relative to sensor to keep
       # Visualize RECM result with confidence overlay (debug)
