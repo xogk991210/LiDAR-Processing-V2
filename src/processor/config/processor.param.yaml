@@ -1,3 +1,11 @@
+# Parameter tuning guide
+# Increase road_maximum_slope_m_per_m for steep slopes or ramps
+# Decrease grid_radial_spacing_m and grid_slice_resolution_deg for finer detail
+# Raise ground_height_threshold_m or amplification_factor for uneven terrain
+# Adjust min_distance_m and max_distance_m to suit sensor placement
+# Tweak voxel_grid_* resolutions to control clustering density
+# The parameters below are tuned for removing ground and detecting
+# obstacles on moderately steep hills.
 processor:
   ros__parameters:
     input_cloud_topic: /pointcloud_organized
@@ -8,28 +16,29 @@ processor:
     clustered_cloud_topic: /clustered_pointcloud
     obstacle_outlines_topic: /obstacle_outlines
     segmentation_configuration:
-      # sensor configurations
-      elevation_up_deg: 2.0
-      elevation_down_deg: -24.8
-      image_width: 2048
-      image_height: 64
-      # segmentation algorithm parameters
-      assume_unorganized_cloud: false
-      grid_radial_spacing_m: 2.0
-      grid_slice_resolution_deg: 1.0
-      ground_height_threshold_m: 0.2
-      road_maximum_slope_m_per_m: 0.2
-      min_distance_m: 2.0
-      max_distance_m: 100.0
-      sensor_height_m: 1.73
-      kernel_threshold_distance_m: 1.0
-      amplification_factor: 5.0
-      z_min_m: -3.0
-      z_max_m: 4.0
-      # visualize intermediate results with OpenCV?
+      # Sensor parameters used to convert the input cloud into an organized image
+      elevation_up_deg: 2.0           # top of vertical field of view
+      elevation_down_deg: -24.8        # bottom of vertical field of view
+      image_width: 2048                # expected horizontal resolution
+      image_height: 64                 # expected number of laser rings
+      # Segmentation algorithm tuning parameters
+      assume_unorganized_cloud: false  # set true if incoming cloud has no ring index
+      grid_radial_spacing_m: 0.8       # radial cell size used in RECM grid
+      grid_slice_resolution_deg: 0.5   # azimuth slice resolution
+      ground_height_threshold_m: 0.35  # obstacle height threshold
+      road_maximum_slope_m_per_m: 0.40 # expected road slope in meters per meter
+      min_distance_m: 1.0              # ignore points closer than this distance
+      max_distance_m: 80.0             # ignore points farther than this distance
+      sensor_height_m: 1.73            # lidar height relative to ground
+      kernel_threshold_distance_m: 2.0 # RECM morphological kernel diameter in meters
+      amplification_factor: 4.0        # vertical difference amplification for RECM
+      z_min_m: -2.0                    # minimum z relative to sensor to keep
+      z_max_m: 3.0                     # maximum z relative to sensor to keep
+      # Visualize RECM result with confidence overlay (debug)
       display_recm_with_low_confidence_points: false
     clustering_configuration:
-      voxel_grid_range_resolution_m: 0.4
-      voxel_grid_azimuth_resolution_deg: 1.0
-      voxel_grid_elevation_resolution_deg: 3.0
-      min_cluster_size: 3
+      voxel_grid_range_resolution_m: 0.3        # radial voxel size for clustering (was 0.4)
+      voxel_grid_azimuth_resolution_deg: 0.5    # azimuth voxel size (was 1.0)
+      voxel_grid_elevation_resolution_deg: 1.5  # elevation voxel size (was 3.0)
+      min_cluster_size: 5                       # discard clusters below this size
+
